@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Avances de Tesis - UAP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .university-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff8c00;
+            margin-bottom: 15px;
+        }
+
+        .advisor-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .advisor-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff8c00, #ffa500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 3px solid #ff8c00;
+            overflow: hidden;
+        }
+
+        .advisor-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .advisor-details h3 {
+            font-size: 1.1rem;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .advisor-details p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .tab.active {
+            background: rgba(255, 140, 0, 0.3);
+            border-color: #ff8c00;
+            color: #ff8c00;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: #ff8c00;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ff8c00;
+            font-size: 1rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(26, 26, 26, 0.9);
+            color: #ffffff;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.2);
+        }
+
+        .form-select option {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        .file-upload {
+            border: 3px dashed rgba(255, 140, 0, 0.5);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(255, 140, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .file-upload:hover, .file-upload.dragover {
+            border-color: #ff8c00;
+            background: rgba(255, 140, 0, 0.1);
+        }
+
+        .file-upload.has-file {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .upload-subtext {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .file-info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .files-list {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .files-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 140, 0, 0.2);
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .file-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            align-items: center;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .file-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-new {
+            background: rgba(255, 140, 0, 0.2);
+            color: #ff8c00;
+        }
+
+        .status-downloaded {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 350px;
+            font-size: 0.95rem;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff8c00;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .university-name {
+                font-size: 1.5rem;
+            }
+            
+            .advisor-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .files-header, .file-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: center;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="university-name">UNIVERSIDAD AUTÓNOMA DEL PERÚ</div>
+            <div class="advisor-info">
+                <div class="advisor-photo">
+                    <img src="hugo-vega-huerta.jpg" alt="Dr. Hugo Vega Huerta" onerror="this.style.display='none'; this.parentElement.innerHTML='👨‍🏫';">
+                </div>
+                <div class="advisor-details">
+                    <h3>Dr. Hugo Vega Huerta</h3>
+                    <p>Asesor de Tesis</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showSection('upload')">📤 Subir Avance</div>
+            <div class="tab" onclick="showSection('admin')">👨‍🏫 Panel Profesor</div>
+            <div class="tab" onclick="showSection('stats')">📊 Estadísticas</div>
+        </div>
+
+        <!-- SECCIÓN SUBIR AVANCE -->
+        <div id="upload" class="section active">
+            <div class="form-container">
+                <div class="form-title">📤 Subir Avance de Tesis</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Grupo:</label>
+                    <select class="form-select" id="grupo" required>
+                        <option value="">Selecciona tu grupo</option>
+                        <option value="Grupo 1">Grupo 1 - Colos, Sanchez, Quicaño</option>
+                        <option value="Grupo 2">Grupo 2 - Saavedra, Collantes, Casas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Semana:</label>
+                    <select class="form-select" id="semana" required>
+                        <option value="">Selecciona la semana</option>
+                        <option value="Semana 1">Semana 1 - Formulación del Título</option>
+                        <option value="Semana 2">Semana 2 - Análisis del Título</option>
+                        <option value="Semana 3">Semana 3 - Objetivos</option>
+                        <option value="Semana 4">Semana 4 - Marco Problemático</option>
+                        <option value="Semana 5">Semana 5 - Marco Teórico (Antecedentes)</option>
+                        <option value="Semana 6">Semana 6 - Marco Teórico (Bases Teóricas)</option>
+                        <option value="Semana 7">Semana 7 - Hipótesis y Variables</option>
+                        <option value="Semana 8">Semana 8 - Metodología</option>
+                        <option value="Semana 9">Semana 9 - Presentación de Avance</option>
+                        <option value="Semana 10">Semana 10 - Instrumentos de Recolección</option>
+                        <option value="Semana 11">Semana 11 - Recolección de Datos</option>
+                        <option value="Semana 12">Semana 12 - Análisis Estadístico</option>
+                        <option value="Semana 13">Semana 13 - Resultados y Discusión</option>
+                        <option value="Semana 14">Semana 14 - Conclusiones</option>
+                        <option value="Semana 15">Semana 15 - Revisión y Correcciones</option>
+                        <option value="Semana 16">Semana 16 - Entrega Final</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre del Estudiante:</label>
+                    <input type="text" class="form-input" id="estudiante" placeholder="Tu nombre completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Comentarios (opcional):</label>
+                    <textarea class="form-input" id="comentarios" placeholder="Comentarios adicionales sobre el avance..." rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Archivo de Tesis (PDF, DOC, DOCX - Máx. 50MB):</label>
+                    <div class="file-upload" id="fileUpload">
+                        <input type="file" id="fileInput" accept=".pdf,.doc,.docx">
+                        <div class="upload-text">📎 Arrastra tu archivo aquí o haz click para seleccionar</div>
+                        <div class="upload-subtext">Formatos: PDF, DOC, DOCX | Tamaño máximo: 50MB</div>
+                    </div>
+                    <div class="file-info" id="fileInfo"></div>
+                </div>
+
+                <button class="submit-btn" onclick="submitForm()">📤 Subir Avance de Tesis</button>
+            </div>
+        </div>
+
+        <!-- PANEL PROFESOR -->
+        <div id="admin" class="section">
+            <div class="form-title">👨‍🏫 Panel del Profesor</div>
+            <p style="text-align: center; opacity: 0.8; margin-bottom: 30px; font-size: 1.1rem;">
+                Gestiona y descarga todos los avances subidos por los estudiantes.
+            </p>
+
+            <div class="files-list">
+                <div class="files-header">
+                    <div>Archivo</div>
+                    <div>Grupo</div>
+                    <div>Semana</div>
+                    <div>Fecha</div>
+                    <div>Acción</div>
+                </div>
+                
+                <div id="filesList">
+                    <!-- Los archivos se mostrarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div id="stats" class="section">
+            <div class="form-title">📊 Estadísticas del Proyecto</div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">Semanas Totales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalFiles">0</div>
+                    <div class="stat-label">Avances Subidos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="grupo1Progress">0%</div>
+                    <div class="stat-label">Progreso Grupo 1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="grupo2Progress">0%</div>
+                    <div class="stat-label">Progreso Grupo 2</div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3 style="color: #ff8c00; margin-bottom: 20px; font-size: 1.3rem;">📋 Información de los Grupos</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 10px;">
+                        <h4 style="color: #ff8c00; margin-bottom: 15px;">👥 Grupo 1</h4>
+                        <ul style="line-height: 2;">
+                            <li>• Colos</li>
+                            <li>• Sanchez</li>
+                            <li>• Quicaño</li>
+                        </ul>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 10px;">
+                        <h4 style="color: #ff8c00; margin-bottom: 15px;">👥 Grupo 2</h4>
+                        <ul style="line-height: 2;">
+                            <li>• Saavedra</li>
+                            <li>• Collantes</li>
+                            <li>• Casas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let submissions = [];
+        let selectedFile = null;
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFileUpload();
+            updateDisplay();
+        });
+
+        // Configurar funcionalidad de subida de archivos
+        function setupFileUpload() {
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+
+            // Click en zona de subida
+            fileUpload.addEventListener('click', () => fileInput.click());
+
+            // Drag & Drop
+            fileUpload.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUpload.classList.add('dragover');
+            });
+
+            fileUpload.addEventListener('dragleave', () => {
+                fileUpload.classList.remove('dragover');
+            });
+
+            fileUpload.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUpload.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            // Selección de archivo
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+        }
+
+        // Manejar selección de archivo
+        function handleFileSelect(file) {
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            
+            if (file.size > maxSize) {
+                showNotification('❌ El archivo es demasiado grande. Máximo 50MB.', 'error');
+                return;
+            }
+            
+            if (!allowedTypes.includes(file.type)) {
+                showNotification('❌ Tipo de archivo no válido. Solo PDF, DOC o DOCX.', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            
+            // Actualizar UI
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInfo = document.getElementById('fileInfo');
+            
+            fileUpload.classList.add('has-file');
+            fileUpload.querySelector('.upload-text').textContent = '✅ Archivo seleccionado correctamente';
+            
+            fileInfo.style.display = 'block';
+            fileInfo.innerHTML = `
+                <strong>📎 Archivo seleccionado:</strong><br>
+                <strong>Nombre:</strong> ${file.name}<br>
+                <strong>Tamaño:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB<br>
+                <strong>Tipo:</strong> ${file.type}
+            `;
+            
+            showNotification('✅ Archivo seleccionado correctamente', 'success');
+        }
+
+        // Enviar formulario
+        function submitForm() {
+            const grupo = document.getElementById('grupo').value;
+            const semana = document.getElementById('semana').value;
+            const estudiante = document.getElementById('estudiante').value;
+            const comentarios = document.getElementById('comentarios').value;
+
+            if (!grupo || !semana || !estudiante) {
+                showNotification('❌ Por favor completa todos los campos requeridos', 'error');
+                return;
+            }
+
+            if (!selectedFile) {
+                showNotification('❌ Por favor selecciona un archivo', 'error');
+                return;
+            }
+
+            // Crear nueva submission
+            const newSubmission = {
+                id: submissions.length + 1,
+                grupo: grupo,
+                semana: semana,
+                estudiante: estudiante,
+                comentarios: comentarios,
+                archivo: selectedFile.name,
+                fecha: new Date().toLocaleDateString('es-PE'),
+                estado: 'new',
+                fileData: selectedFile // Guardamos el archivo para descarga
+            };
+
+            submissions.push(newSubmission);
+
+            // Limpiar formulario
+            document.getElementById('grupo').value = '';
+            document.getElementById('semana').value = '';
+            document.getElementById('estudiante').value = '';
+            document.getElementById('comentarios').value = '';
+            document.getElementById('fileInput').value = '';
+            
+            // Resetear zona de archivos
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInfo = document.getElementById('fileInfo');
+            fileUpload.classList.remove('has-file');
+            fileUpload.querySelector('.upload-text').textContent = '📎 Arrastra tu archivo aquí o haz click para seleccionar';
+            fileInfo.style.display = 'none';
+            selectedFile = null;
+
+            updateDisplay();
+            showNotification('🎉 ¡Avance subido exitosamente!', 'success');
+        }
+
+        // Cambiar sección
+        function showSection(sectionName) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Desactivar todos los tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar sección seleccionada
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Activar tab seleccionado
+            event.target.classList.add('active');
+        }
+
+        // Actualizar visualización
+        function updateDisplay() {
+            updateFilesList();
+            updateStats();
+        }
+
+        // Actualizar lista de archivos
+        function updateFilesList() {
+            const filesList = document.getElementById('filesList');
+            
+            if (submissions.length === 0) {
+                filesList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; opacity: 0.6;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">📄</div>
+                        <p style="font-size: 1.1rem;">No hay avances subidos aún</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filesList.innerHTML = submissions.map(submission => `
+                <div class="file-row">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.2rem;">📄</span>
+                            <span>${submission.archivo}</span>
+                        </div>
+                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 3px;">
+                            ${submission.estudiante}
+                        </div>
+                    </div>
+                    <div>${submission.grupo}</div>
+                    <div>${submission.semana.split(' - ')[0]}</div>
+                    <div>${submission.fecha}</div>
+                    <div>
+                        <button class="download-btn" onclick="downloadFile(${submission.id})">
+                            📥 Descargar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Descargar archivo
+        function downloadFile(submissionId) {
+            const submission = submissions.find(s => s.id === submissionId);
+            if (submission && submission.fileData) {
+                // Crear URL para descarga
+                const url = URL.createObjectURL(submission.fileData);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = submission.archivo;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification(`📥 Descargando ${submission.archivo}...`, 'success');
+                
+                // Actualizar estado a descargado
+                submission.estado = 'downloaded';
+                updateDisplay();
+            }
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const totalFiles = submissions.length;
+            const grupo1Files = submissions.filter(s => s.grupo === 'Grupo 1').length;
+            const grupo2Files = submissions.filter(s => s.grupo === 'Grupo 2').length;
+            
+            document.getElementById('totalFiles').textContent = totalFiles;
+            document.getElementById('grupo1Progress').textContent = Math.round((grupo1Files / 16) * 100) + '%';
+            document.getElementById('grupo2Progress').textContent = Math.round((grupo2Files / 16) * 100) + '%';
+        }
+
+        // Mostrar notificaciones
+        function showNotification(message, type = 'success') {
+            // Remover notificación existente
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
